@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Mi Galería</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    :root {
+      --color-fondo: #111827;
+      --color-primario: #2563eb;
+      --color-texto: #f9fafb;
+      --color-tarjeta: #1f2937;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        sans-serif;
+    }
+
+    body {
+      background: radial-gradient(circle at top, #1f2937 0, #020617 55%);
+      color: var(--color-texto);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      padding: 1rem 1.5rem;
+      background: rgba(15, 23, 42, 0.9);
+      border-bottom: 1px solid rgba(148, 163, 184, 0.3);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      backdrop-filter: blur(12px);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    header h1 {
+      font-size: 1.4rem;
+      font-weight: 600;
+    }
+
+    header button {
+      background: var(--color-primario);
+      color: white;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 999px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      font-weight: 500;
+      transition: transform 0.15s, box-shadow 0.15s, background 0.15s;
+      box-shadow: 0 10px 25px rgba(37, 99, 235, 0.4);
+    }
+
+    header button:hover {
+      transform: translateY(-1px);
+      background: #1d4ed8;
+      box-shadow: 0 14px 30px rgba(37, 99, 235, 0.6);
+    }
+
+    main {
+      flex: 1;
+      padding: 1.5rem;
+      max-width: 1100px;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    .hero {
+      background: radial-gradient(circle at top left, #1d4ed8 0, #020617 55%);
+      border-radius: 1.5rem;
+      padding: 1.5rem 1.75rem;
+      margin-bottom: 1.5rem;
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      box-shadow: 0 25px 60px rgba(15, 23, 42, 0.9);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at top right, rgba(248, 250, 252, 0.12), transparent 55%);
+      pointer-events: none;
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero-title {
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 0.4rem;
+    }
+
+    .hero-subtitle {
+      font-size: 1rem;
+      color: #e5e7eb;
+      max-width: 480px;
+    }
+
+    .gallery-section {
+      display: grid;
+      grid-template-columns: minmax(0, 2fr) minmax(0, 1.2fr);
+      gap: 1.5rem;
+    }
+
+    @media (max-width: 900px) {
+      .gallery-section {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .card {
+      background: rgba(15, 23, 42, 0.9);
+      border-radius: 1.25rem;
+      padding: 1rem 1.25rem;
+      border: 1px solid rgba(148, 163, 184, 0.35);
+      box-shadow: 0 18px 45px rgba(15, 23, 42, 0.9);
+      backdrop-filter: blur(16px);
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.75rem;
+    }
+
+    .card-title {
+      font-size: 1rem;
+      font-weight: 600;
+    }
+
+    .pill {
+      font-size: 0.7rem;
+      padding: 0.15rem 0.6rem;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.5);
+      color: #e5e7eb;
+    }
+
+    .media-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 0.75rem;
+    }
+
+    .media-item {
+      background: var(--color-tarjeta);
+      border-radius: 0.9rem;
+      overflow: hidden;
+      border: 1px solid rgba(148, 163, 184, 0.35);
+      position: relative;
+    }
+
+    .media-item img,
+    .media-item video {
+      width: 100%;
+      height: 140px;
+      object-fit: cover;
+      display: block;
+    }
+
+    .media-label {
+      position: absolute;
+      bottom: 0.35rem;
+      left: 0.5rem;
+      right: 0.5rem;
+      font-size: 0.7rem;
+      background: linear-gradient(to right, rgba(15, 23, 42, 0.9), rgba(15, 23, 42, 0.4));
+      padding: 0.25rem 0.5rem;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+      color: #e5e7eb;
+    }
+
+    .media-label span {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .media-label small {
+      opacity: 0.7;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 1.5rem 1rem;
+      color: #9ca3af;
+      font-size: 0.9rem;
+      border-radius: 0.9rem;
+      border: 1px dashed rgba(148, 163, 184, 0.5);
+      background: rgba(15, 23, 42, 0.6);
+    }
+
+    /* Panel de administración */
+
+    .admin-panel {
+      display: none;
+      margin-top: 1.5rem;
+    }
+
+    .admin-panel.active {
+      display: block;
+    }
+
+    .admin-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+      gap: 1rem;
+    }
+
+    .field {
+      margin-bottom: 0.75rem;
+    }
+
+    .field label {
+      display: block;
+      font-size: 0.8rem;
+      margin-bottom: 0.25rem;
+      color: #e5e7eb;
+    }
+
+    .field input[type="text"],
+    .field textarea {
+      width: 100%;
+      padding: 0.45rem 0.6rem;
+      border-radius: 0.6rem;
+      border: 1px solid rgba(148, 163, 184, 0.6);
+      background: rgba(15, 23, 42, 0.9);
+      color: #e5e7eb;
+      font-size: 0.85rem;
+      resize: vertical;
+    }
+
+    .field input[type="color"] {
+      width: 100%;
+      height: 2.2rem;
+      border-radius: 0.6rem;
+      border: 1px solid rgba(148, 163, 184, 0.6);
+      background: transparent;
+      padding: 0.1rem;
+      cursor: pointer;
+    }
+
+    .field input[type="file"] {
+      width: 100%;
+      font-size: 0.8rem;
+      color: #e5e7eb;
+    }
+
+    .hint {
+      font-size: 0.7rem;
+      color: #9ca3af;
+      margin-top: 0.15rem;
+    }
+
+    .admin-login {
+      margin-top: 1rem;
+      display: none;
+    }
+
+    .admin-login.active {
+      display: block;
+    }
+
+    .admin-login input {
+      padding: 0.4rem 0.6rem;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.6);
+      background: rgba(15, 23, 42, 0.9);
+      color: #e5e7eb;
+      font-size: 0.85rem;
+      margin-right: 0.4rem;
+    }
+
+    .admin-login button {
+      padding: 0.4rem 0.8rem;
+      border-radius: 999px;
+      border: none;
+      background: var(--color-primario);
+      color: white;
+      font-size: 0.8rem;
+      cursor: pointer;
+    }
+
+    footer {
+      text-align: center;
+      padding: 0.75rem;
+      font-size: 0.75rem;
+      color: #6b7280;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1 id="siteTitle">Mi Galería</h1>
+    <div>
+      <button id="adminToggleBtn">Admin</button>
+    </div>
+  </header>
+
+  <main>
+    <!-- Hero / cabecera editable -->
+    <section class="hero">
+      <div class="hero-content">
+        <h2 class="hero-title" id="heroTitle">Bienvenido a mi galería</h2>
+        <p class="hero-subtitle" id="heroSubtitle">
+          Aquí subo mis fotos y vídeos favoritos. Puedes cambiar este texto desde el panel de administración.
+        </p>
+      </div>
+    </section>
+
+    <!-- Galería + Panel admin -->
+    <section class="gallery-section">
+      <!-- Galería -->
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">Galería</h3>
+          <span class="pill">Vista pública</span>
+        </div>
+        <div id="mediaContainer" class="media-grid">
+          <!-- Aquí se añaden las fotos y vídeos -->
+        </div>
+        <div id="emptyState" class="empty-state">
+          Todavía no has añadido nada. Entra en el panel de administración y sube fotos o vídeos.
+        </div>
+      </div>
+
+      <!-- Panel de administración -->
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">Panel de administración</h3>
+          <span class="pill">Protegido</span>
+        </div>
+
+        <!-- Login admin -->
+        <div id="adminLogin" class="admin-login">
+          <span style="font-size:0.8rem;margin-right:0.4rem;">Código de administrador:</span>
+          <input type="password" id="adminPasswordInput" placeholder="Escribe el código" />
+          <button id="adminLoginBtn">Entrar</button>
+          <div class="hint">Código por defecto: <strong>1234</strong> (puedes cambiarlo en el código).</div>
+        </div>
+
+        <!-- Contenido admin -->
+        <div id="adminPanel" class="admin-panel">
+          <div class="admin-grid">
+            <!-- Textos -->
+            <div>
+              <div class="field">
+                <label for="siteTitleInput">Título de la web</label>
+                <input type="text" id="siteTitleInput" />
+              </div>
+              <div class="field">
+                <label for="heroTitleInput">Título principal</label>
+                <input type="text" id="heroTitleInput" />
+              </div>
+              <div class="field">
+                <label for="heroSubtitleInput">Texto de descripción</label>
+                <textarea id="heroSubtitleInput" rows="3"></textarea>
+              </div>
+            </div>
+
+            <!-- Colores -->
+            <div>
+              <div class="field">
+                <label for="bgColorInput">Color de fondo</label>
+                <input type="color" id="bgColorInput" value="#111827" />
+              </div>
+              <div class="field">
+                <label for="primaryColorInput">Color principal (botones, detalles)</label>
+                <input type="color" id="primaryColorInput" value="#2563eb" />
+              </div>
+              <div class="field">
+                <label for="cardColorInput">Color de tarjetas</label>
+                <input type="color" id="cardColorInput" value="#1f2937" />
+              </div>
+            </div>
+
+            <!-- Archivos -->
+            <div>
+              <div class="field">
+                <label for="imageInput">Añadir fotos</label>
+                <input type="file" id="imageInput" accept="image/*" multiple />
+                <div class="hint">Solo se muestran mientras la página está abierta (no se suben a un servidor).</div>
+              </div>
+              <div class="field">
+                <label for="videoInput">Añadir vídeos</label>
+                <input type="file" id="videoInput" accept="video/*" multiple />
+                <div class="hint">Los vídeos se reproducen directamente en la página.</div>
+              </div>
+            </div>
+          </div>
+          <div class="hint" style="margin-top:0.5rem;">
+            Los textos y colores se guardan en tu navegador (localStorage). Si borras los datos del navegador, se pierden.
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    Panel simple hecho para que puedas modificar tu galería sin tocar el código.
+  </footer>
+
+  <script>
+    // ==========================
+    // CONFIGURACIÓN BÁSICA
+    // ==========================
+    const ADMIN_CODE = "1234"; // Cambia este código si quieres otro
+
+    // Elementos
+    const adminToggleBtn = document.getElementById("adminToggleBtn");
+    const adminLogin = document.getElementById("adminLogin");
+    const adminPanel = document.getElementById("adminPanel");
+    const adminPasswordInput = document.getElementById("adminPasswordInput");
+    const adminLoginBtn = document.getElementById("adminLoginBtn");
+
+    const siteTitleEl = document.getElementById("siteTitle");
+    const heroTitleEl = document.getElementById("heroTitle");
+    const heroSubtitleEl = document.getElementById("heroSubtitle");
+
+    const siteTitleInput = document.getElementById("siteTitleInput");
+    const heroTitleInput = document.getElementById("heroTitleInput");
+    const heroSubtitleInput = document.getElementById("heroSubtitleInput");
+
+    const bgColorInput = document.getElementById("bgColorInput");
+    const primaryColorInput = document.getElementById("primaryColorInput");
+    const cardColorInput = document.getElementById("cardColorInput");
+
+    const mediaContainer = document.getElementById("mediaContainer");
+    const emptyState = document.getElementById("emptyState");
+    const imageInput = document.getElementById("imageInput");
+    const videoInput = document.getElementById("videoInput");
+
+    // ==========================
+    // LOCALSTORAGE (textos/colores)
+    // ==========================
+    const STORAGE_KEY = "mi_galeria_config";
+
+    function loadConfig() {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (!saved) return;
+      try {
+        const data = JSON.parse(saved);
+        if (data.siteTitle) siteTitleEl.textContent = data.siteTitle;
+        if (data.heroTitle) heroTitleEl.textContent = data.heroTitle;
+        if (data.heroSubtitle) heroSubtitleEl.textContent = data.heroSubtitle;
+
+        if (data.siteTitle) siteTitleInput.value = data.siteTitle;
+        if (data.heroTitle) heroTitleInput.value = data.heroTitle;
+        if (data.heroSubtitle) heroSubtitleInput.value = data.heroSubtitle;
+
+        if (data.bgColor) {
+          document.documentElement.style.setProperty("--color-fondo", data.bgColor);
+          bgColorInput.value = data.bgColor;
+        }
+        if (data.primaryColor) {
+          document.documentElement.style.setProperty("--color-primario", data.primaryColor);
+          primaryColorInput.value = data.primaryColor;
+        }
+        if (data.cardColor) {
+          document.documentElement.style.setProperty("--color-tarjeta", data.cardColor);
+          cardColorInput.value = data.cardColor;
+        }
+      } catch (e) {
+        console.error("Error cargando configuración:", e);
+      }
+    }
+
+    function saveConfig() {
+      const data = {
+        siteTitle: siteTitleEl.textContent,
+        heroTitle: heroTitleEl.textContent,
+        heroSubtitle: heroSubtitleEl.textContent,
+        bgColor: bgColorInput.value,
+        primaryColor: primaryColorInput.value,
+        cardColor: cardColorInput.value,
+      };
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    }
+
+    // ==========================
+    // ADMIN: mostrar/ocultar
+    // ==========================
+    let adminVisible = false;
+    let adminUnlocked = false;
+
+    adminToggleBtn.addEventListener("click", () => {
+      if (!adminUnlocked) {
+        adminLogin.classList.toggle("active");
+      } else {
+        adminVisible = !adminVisible;
+        adminPanel.classList.toggle("active", adminVisible);
+      }
+    });
+
+    adminLoginBtn.addEventListener("click", () => {
+      const value = adminPasswordInput.value.trim();
+      if (value === ADMIN_CODE) {
+        adminUnlocked = true;
+        adminLogin.classList.remove("active");
+        adminPanel.classList.add("active");
+        adminVisible = true;
+        adminPasswordInput.value = "";
+      } else {
+        alert("Código incorrecto");
+      }
+    });
+
+    // ==========================
+    // Sincronizar textos
+    // ==========================
+    siteTitleInput.addEventListener("input", () => {
+      siteTitleEl.textContent = siteTitleInput.value || "Mi Galería";
+      saveConfig();
+    });
+
+    heroTitleInput.addEventListener("input", () => {
+      heroTitleEl.textContent = heroTitleInput.value || "Bienvenido a mi galería";
+      saveConfig();
+    });
+
+    heroSubtitleInput.addEventListener("input", () => {
+      heroSubtitleEl.textContent =
+        heroSubtitleInput.value ||
+        "Aquí subo mis fotos y vídeos favoritos. Puedes cambiar este texto desde el panel de administración.";
+      saveConfig();
+    });
+
+    // ==========================
+    // Sincronizar colores
+    // ==========================
+    bgColorInput.addEventListener("input", () => {
+      document.documentElement.style.setProperty("--color-fondo", bgColorInput.value);
+      document.body.style.background = bgColorInput.value;
+      saveConfig();
+    });
+
+    primaryColorInput.addEventListener("input", () => {
+      document.documentElement.style.setProperty("--color-primario", primaryColorInput.value);
+      saveConfig();
+    });
+
+    cardColorInput.addEventListener("input", () => {
+      document.documentElement.style.setProperty("--color-tarjeta", cardColorInput.value);
+      saveConfig();
+    });
+
+    // ==========================
+    // Gestión de archivos (solo vista local)
+    // ==========================
+    function updateEmptyState() {
+      const hasItems = mediaContainer.children.length > 0;
+      emptyState.style.display = hasItems ? "none" : "block";
+    }
+
+    function addMediaItem(file, type) {
+      const url = URL.createObjectURL(file);
+      const item = document.createElement("div");
+      item.className = "media-item";
+
+      if (type === "image") {
+        const img = document.createElement("img");
+        img.src = url;
+        img.alt = file.name;
+        item.appendChild(img);
+      } else if (type === "video") {
+        const video = document.createElement("video");
+        video.src = url;
+        video.controls = true;
+        item.appendChild(video);
+      }
+
+      const label = document.createElement("div");
+      label.className = "media-label";
+      const nameSpan = document.createElement("span");
+      nameSpan.textContent = file.name;
+      const sizeSmall = document.createElement("small");
+      sizeSmall.textContent = (file.size / (1024 * 1024)).toFixed(1) + " MB";
+      label.appendChild(nameSpan);
+      label.appendChild(sizeSmall);
+      item.appendChild(label);
+
+      mediaContainer.appendChild(item);
+      updateEmptyState();
+    }
+
+    imageInput.addEventListener("change", (e) => {
+      const files = Array.from(e.target.files || []);
+      files.forEach((file) => addMediaItem(file, "image"));
+      imageInput.value = "";
+    });
+
+    videoInput.addEventListener("change", (e) => {
+      const files = Array.from(e.target.files || []);
+      files.forEach((file) => addMediaItem(file, "video"));
+      videoInput.value = "";
+    });
+
+    // ==========================
+    // INICIO
+    // ==========================
+    loadConfig();
+    updateEmptyState();
+  </script>
+</body>
+</html>
